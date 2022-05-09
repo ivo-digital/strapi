@@ -3,7 +3,9 @@ import { render } from '@testing-library/react';
 import { IntlProvider } from 'react-intl';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
+import { lightTheme, darkTheme } from '@strapi/design-system';
 import Theme from '../../../../components/Theme';
+import ThemeToggleProvider from '../../../../components/ThemeToggleProvider';
 import NoContentType from '../index';
 
 jest.mock('@strapi/helper-plugin', () => ({
@@ -17,9 +19,11 @@ describe('CONTENT MANAGER | pages | NoContentType', () => {
     } = render(
       <Router history={createMemoryHistory()}>
         <IntlProvider messages={{}} defaultLocale="en" textComponent="span" locale="en">
-          <Theme>
-            <NoContentType />
-          </Theme>
+          <ThemeToggleProvider themes={{ light: lightTheme, dark: darkTheme }}>
+            <Theme>
+              <NoContentType />
+            </Theme>
+          </ThemeToggleProvider>
         </IntlProvider>
       </Router>
     );
@@ -101,7 +105,7 @@ describe('CONTENT MANAGER | pages | NoContentType', () => {
       .c14 {
         padding: 8px 16px;
         background: #4945ff;
-        border: none;
+        border: 1px solid #4945ff;
         border-radius: 4px;
         border: 1px solid #d9d8ff;
         background: #f0f0ff;
@@ -197,6 +201,10 @@ describe('CONTENT MANAGER | pages | NoContentType', () => {
       }
 
       .c2 {
+        -webkit-align-items: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
         display: -webkit-box;
         display: -webkit-flex;
         display: -ms-flexbox;
@@ -208,13 +216,13 @@ describe('CONTENT MANAGER | pages | NoContentType', () => {
         -webkit-justify-content: space-between;
         -ms-flex-pack: justify;
         justify-content: space-between;
+      }
+
+      .c3 {
         -webkit-align-items: center;
         -webkit-box-align: center;
         -ms-flex-align: center;
         align-items: center;
-      }
-
-      .c3 {
         display: -webkit-box;
         display: -webkit-flex;
         display: -ms-flexbox;
@@ -222,10 +230,6 @@ describe('CONTENT MANAGER | pages | NoContentType', () => {
         -webkit-flex-direction: row;
         -ms-flex-direction: row;
         flex-direction: row;
-        -webkit-align-items: center;
-        -webkit-box-align: center;
-        -ms-flex-align: center;
-        align-items: center;
       }
 
       .c4 {
