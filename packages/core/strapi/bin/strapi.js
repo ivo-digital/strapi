@@ -95,6 +95,7 @@ program
   .option('--dbssl <dbssl>', 'Database SSL')
   .option('--dbfile <dbfile>', 'Database file path for sqlite')
   .option('--dbforce', 'Allow overwriting existing database content')
+  .option('-ts, --typescript', 'Create a typescript project')
   .description('Create a new application')
   .action(require('../lib/commands/new'));
 
@@ -175,6 +176,16 @@ program
 
 // Admin
 program
+  .command('admin:create-user')
+  .alias('admin:create')
+  .description('Create a new admin')
+  .option('-e, --email <email>', 'Email of the new admin')
+  .option('-p, --password <password>', 'Password of the new admin')
+  .option('-f, --firstname <first name>', 'First name of the new admin')
+  .option('-l, --lastname <last name>', 'Last name of the new admin')
+  .action(getLocalScript('admin-create'));
+
+program
   .command('admin:reset-user-password')
   .alias('admin:reset-password')
   .description("Reset an admin user's password")
@@ -216,5 +227,29 @@ program
   .command('controllers:list')
   .description('List all the application controllers')
   .action(getLocalScript('controllers/list'));
+
+//    `$ strapi opt-out-telemetry`
+program
+  .command('telemetry:disable')
+  .description('Disable anonymous telemetry and metadata sending to Strapi analytics')
+  .action(getLocalScript('opt-out-telemetry'));
+
+//    `$ strapi opt-in-telemetry`
+program
+  .command('telemetry:enable')
+  .description('Enable anonymous telemetry and metadata sending to Strapi analytics')
+  .action(getLocalScript('opt-in-telemetry'));
+
+program
+  .command('ts:generate-types')
+  .description(`Generate TypeScript typings for your schemas`)
+  .option(
+    '-o, --out-dir <outDir>',
+    'Specify a relative directory in which the schemas definitions will be generated'
+  )
+  .option('-f, --file <file>', 'Specify a filename to store the schemas definitions')
+  .option('--verbose', `Display more information about the types generation`, false)
+  .option('-s, --silent', `Run the generation silently, without any output`, false)
+  .action(getLocalScript('ts/generate-types'));
 
 program.parseAsync(process.argv);

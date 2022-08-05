@@ -106,7 +106,10 @@ describe('Filtering API', () => {
 
     const sanitizedFixtures = await builder.sanitizedFixtures(strapi);
 
-    Object.assign(data, _.mapValues(sanitizedFixtures, value => transformToRESTResource(value)));
+    Object.assign(
+      data,
+      _.mapValues(sanitizedFixtures, value => transformToRESTResource(value))
+    );
   });
 
   afterAll(async () => {
@@ -156,6 +159,40 @@ describe('Filtering API', () => {
             filters: {
               name: {
                 $eq: 'Product non existant',
+              },
+            },
+          },
+        });
+
+        expect(res.body.data).toEqual([]);
+      });
+    });
+    describe('Filter equals with case insensitive', () => {
+      test('Should be usable with eqi suffix', async () => {
+        const res = await rq({
+          method: 'GET',
+          url: '/products',
+          qs: {
+            filters: {
+              name: {
+                $eqi: 'PRODuct 1',
+              },
+            },
+          },
+        });
+
+        expect(res.body.data.length).toBe(1);
+        expect(res.body.data[0]).toMatchObject(data.product[0]);
+      });
+
+      test('Should return an empty array when no match', async () => {
+        const res = await rq({
+          method: 'GET',
+          url: '/products',
+          qs: {
+            filters: {
+              name: {
+                $eqi: 'Product non existant',
               },
             },
           },

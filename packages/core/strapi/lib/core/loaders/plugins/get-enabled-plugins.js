@@ -29,10 +29,11 @@ const toDetailedDeclaration = declaration => {
   let detailedDeclaration = pick(['enabled'], declaration);
   if (has('resolve', declaration)) {
     let pathToPlugin = '';
+
     try {
       pathToPlugin = dirname(require.resolve(declaration.resolve));
     } catch (e) {
-      pathToPlugin = resolve(strapi.dirs.root, declaration.resolve);
+      pathToPlugin = resolve(strapi.dirs.app.root, declaration.resolve);
 
       if (!existsSync(pathToPlugin) || !statSync(pathToPlugin).isDirectory()) {
         throw new Error(`${declaration.resolve} couldn't be resolved`);
@@ -71,7 +72,10 @@ const getEnabledPlugins = async strapi => {
       validatePluginName(packageInfo.strapi.name);
       installedPlugins[packageInfo.strapi.name] = {
         ...toDetailedDeclaration({ enabled: true, resolve: packagePath }),
-        info: packageInfo.strapi,
+        info: {
+          ...packageInfo.strapi,
+          packageName: packageInfo.name,
+        },
       };
     }
   }

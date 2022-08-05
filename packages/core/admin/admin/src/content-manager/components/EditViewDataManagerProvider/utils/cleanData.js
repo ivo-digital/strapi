@@ -18,21 +18,8 @@ const cleanData = (retrievedData, currentSchema, componentsSchema) => {
 
       switch (attrType) {
         case 'json':
-          try {
-            cleanedData = JSON.parse(value);
-          } catch (err) {
-            cleanedData = value;
-          }
-
+          cleanedData = JSON.parse(value);
           break;
-        // TODO
-        // case 'date':
-        //   cleanedData =
-        //     value && value._isAMomentObject === true ? value.format('YYYY-MM-DD') : value;
-        //   break;
-        // case 'datetime':
-        //   cleanedData = value && value._isAMomentObject === true ? value.toISOString() : value;
-        //   break;
         case 'time': {
           cleanedData = value;
 
@@ -62,6 +49,7 @@ const cleanData = (retrievedData, currentSchema, componentsSchema) => {
           } else {
             cleanedData = value ? recursiveCleanData(value, componentsSchema[component]) : value;
           }
+
           break;
         case 'dynamiczone':
           cleanedData = value.map(componentData => {
