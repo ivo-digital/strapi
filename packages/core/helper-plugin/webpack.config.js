@@ -1,14 +1,15 @@
 const webpack = require('webpack');
-const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { ESBuildMinifyPlugin } = require('esbuild-loader');
+const browserslistToEsbuild = require('browserslist-to-esbuild');
+
 const packageJson = require('./package.json');
 
 const nodeModules = [];
 [
-  ...Object.keys(packageJson.dependencies),
-  ...Object.keys(packageJson.peerDependencies),
-  ...Object.keys(packageJson.devDependencies),
-].forEach(module => {
+  ...Object.keys(packageJson.dependencies || {}),
+  ...Object.keys(packageJson.peerDependencies || {}),
+  ...Object.keys(packageJson.devDependencies || {}),
+].forEach((module) => {
   nodeModules.push(new RegExp(`^${module}(/.+)?$`));
 });
 
@@ -16,7 +17,15 @@ module.exports = {
   entry: `${__dirname}/lib/src/index.js`,
   externals: nodeModules,
   mode: process.env.NODE_ENV,
-  devtool: process.env.NODE_ENV === 'development' ? 'eval-source-map' : false,
+  devtool: process.env.NODE_ENV === 'production' ? false : 'eval-source-map',
+  optimization: {
+    minimize: process.env.NODE_ENV === 'production',
+    minimizer: [
+      new ESBuildMinifyPlugin({
+        target: 'es2015',
+      }),
+    ],
+  },
   output: {
     path: `${__dirname}/build`,
     filename: `helper-plugin.${process.env.NODE_ENV}.js`,
@@ -29,16 +38,15 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        include: path.resolve(__dirname, 'lib', 'src'),
-        loader: 'babel-loader',
-        exclude: /(node_modules)/,
+        test: /\.m?jsx?$/,
+        use: {
+          loader: require.resolve('esbuild-loader'),
+          options: {
+            loader: 'jsx',
+            target: browserslistToEsbuild(),
+          },
+        },
       },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
-      },
-
       {
         test: /\.(png|svg|jpg|gif)$/,
         type: 'asset',
@@ -57,9 +65,6 @@ module.exports = {
   plugins: [
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
-    }),
-    new MiniCssExtractPlugin({
-      filename: 'style.css',
     }),
   ],
 };

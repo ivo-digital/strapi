@@ -15,10 +15,11 @@ import pluginId from '../../pluginId';
 import DataManagerProvider from '../../components/DataManagerProvider';
 import FormModalNavigationProvider from '../../components/FormModalNavigationProvider';
 import RecursivePath from '../RecursivePath';
-import icons from './utils/icons.json';
 import ContentTypeBuilderNav from '../../components/ContentTypeBuilderNav';
 
-const ListView = lazy(() => import('../ListView'));
+const ListView = lazy(() =>
+  import(/* webpackChunkName: "content-type-builder-list-view" */ '../ListView')
+);
 
 const App = () => {
   const { formatMessage } = useIntl();
@@ -39,7 +40,7 @@ const App = () => {
     <CheckPagePermissions permissions={pluginPermissions.main}>
       <Helmet title={title} />
       <FormModalNavigationProvider>
-        <DataManagerProvider allIcons={icons}>
+        <DataManagerProvider>
           <Layout sideNav={<ContentTypeBuilderNav />}>
             <Suspense fallback={<LoadingIndicatorPage />}>
               <Switch>

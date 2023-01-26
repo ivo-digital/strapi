@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
+import appCustomisations from './app';
 import { Components, Fields, Middlewares, Reducers } from './core/apis';
 import { axiosInstance } from './core/utils';
-import appCustomisations from './app';
 // eslint-disable-next-line import/extensions
 import plugins from './plugins';
 import appReducers from './reducers';
@@ -9,8 +9,10 @@ import appReducers from './reducers';
 window.strapi = {
   backendURL: process.env.STRAPI_ADMIN_BACKEND_URL,
   isEE: false,
+  telemetryDisabled: process.env.STRAPI_TELEMETRY_DISABLED ?? false,
   features: {
     SSO: 'sso',
+    AUDIT_LOGS: 'audit-logs',
   },
   projectType: 'Community',
 };
@@ -37,8 +39,7 @@ const run = async () => {
     window.strapi.isEE = isEE;
     window.strapi.features = {
       ...window.strapi.features,
-      allFeatures: features,
-      isEnabled: f => features.includes(f),
+      isEnabled: (featureName) => features.some((feature) => feature.name === featureName),
     };
 
     window.strapi.projectType = isEE ? 'Enterprise' : 'Community';
@@ -48,7 +49,7 @@ const run = async () => {
 
   // We need to make sure to fetch the project type before importing the StrapiApp
   // otherwise the strapi-babel-plugin does not work correctly
-  const StrapiApp = await import('./StrapiApp');
+  const StrapiApp = await import(/* webpackChunkName: "admin-app" */ './StrapiApp');
 
   const app = StrapiApp.default({
     appPlugins: plugins,

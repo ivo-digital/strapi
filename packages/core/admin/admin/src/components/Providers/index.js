@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { QueryClientProvider, QueryClient } from 'react-query';
-import { LibraryProvider, StrapiAppProvider } from '@strapi/helper-plugin';
+import { LibraryProvider, CustomFieldsProvider, StrapiAppProvider } from '@strapi/helper-plugin';
 import { Provider } from 'react-redux';
-import { AdminContext, ConfigurationsContext } from '../../contexts';
+import { AdminContext } from '../../contexts';
+import ConfigurationsProvider from '../ConfigurationsProvider';
 import LanguageProvider from '../LanguageProvider';
 import GuidedTour from '../GuidedTour';
 import AutoReloadOverlayBlockerProvider from '../AutoReloadOverlayBlockerProvider';
@@ -24,6 +25,7 @@ const Providers = ({
   authLogo,
   children,
   components,
+  customFields,
   fields,
   getAdminInjectedComponents,
   getPlugin,
@@ -47,8 +49,11 @@ const Providers = ({
         <QueryClientProvider client={queryClient}>
           <Provider store={store}>
             <AdminContext.Provider value={{ getAdminInjectedComponents }}>
-              <ConfigurationsContext.Provider
-                value={{ authLogo, menuLogo, showReleaseNotification, showTutorials }}
+              <ConfigurationsProvider
+                authLogo={authLogo}
+                menuLogo={menuLogo}
+                showReleaseNotification={showReleaseNotification}
+                showTutorials={showTutorials}
               >
                 <StrapiAppProvider
                   getPlugin={getPlugin}
@@ -60,18 +65,20 @@ const Providers = ({
                   settings={settings}
                 >
                   <LibraryProvider components={components} fields={fields}>
-                    <LanguageProvider messages={messages} localeNames={localeNames}>
-                      <AutoReloadOverlayBlockerProvider>
-                        <OverlayBlocker>
-                          <GuidedTour>
-                            <Notifications>{children}</Notifications>
-                          </GuidedTour>
-                        </OverlayBlocker>
-                      </AutoReloadOverlayBlockerProvider>
-                    </LanguageProvider>
+                    <CustomFieldsProvider customFields={customFields}>
+                      <LanguageProvider messages={messages} localeNames={localeNames}>
+                        <AutoReloadOverlayBlockerProvider>
+                          <OverlayBlocker>
+                            <GuidedTour>
+                              <Notifications>{children}</Notifications>
+                            </GuidedTour>
+                          </OverlayBlocker>
+                        </AutoReloadOverlayBlockerProvider>
+                      </LanguageProvider>
+                    </CustomFieldsProvider>
                   </LibraryProvider>
                 </StrapiAppProvider>
-              </ConfigurationsContext.Provider>
+              </ConfigurationsProvider>
             </AdminContext.Provider>
           </Provider>
         </QueryClientProvider>
@@ -84,6 +91,7 @@ Providers.propTypes = {
   authLogo: PropTypes.oneOfType([PropTypes.string, PropTypes.any]).isRequired,
   children: PropTypes.element.isRequired,
   components: PropTypes.object.isRequired,
+  customFields: PropTypes.object.isRequired,
   fields: PropTypes.object.isRequired,
   getAdminInjectedComponents: PropTypes.func.isRequired,
   getPlugin: PropTypes.func.isRequired,
